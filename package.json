@@ -6,7 +6,8 @@
   "scripts": {
     "start": "npx http-server . -p 8080 -o",
     "dev": "npx http-server . -p 8080",
-    "deploy": "vercel --prod"
+    "deploy": "vercel --prod",
+    "build": "echo 'No build step needed for static site'"
   },
   "keywords": [
     "rfp",
@@ -23,5 +24,11 @@
   },
   "engines": {
     "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "airtable": "^0.11.1"
+  },
+  "devDependencies": {
+    "vercel": "^28.0.0"
   }
 }

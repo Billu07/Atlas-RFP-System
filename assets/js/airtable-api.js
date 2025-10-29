@@ -1,41 +1,43 @@
 /**
- * Airtable API Helper
- * Handles all Airtable operations for the RFP system
+ * Airtable API Helper - Vercel Serverless Version
+ * Uses serverless functions to keep API keys secure
  */
 
 class AirtableAPI {
   constructor(config) {
-    this.baseId = config.airtable.baseId;
-    this.apiKey = config.airtable.apiKey;
-    this.tables = config.airtable.tables;
-    this.baseUrl = `https://api.airtable.com/v0/${this.baseId}`;
+    this.config = config;
+    this.apiBase = "/api"; // Vercel serverless functions path
   }
 
   /**
-   * Generic request method
+   * Generic request method to serverless functions
    */
-  async request(endpoint, options = {}) {
-    const url = `${this.baseUrl}/${endpoint}`;
-    const headers = {
-      Authorization: `Bearer ${this.apiKey}`,
-      "Content-Type": "application/json",
-      ...options.headers,
-    };
+  async apiRequest(endpoint, options = {}) {
+    const url = `${this.apiBase}/${endpoint}`;
 
     try {
       const response = await fetch(url, {
+        headers: {
+          "Content-Type": "application/json",
+          ...options.headers,
+        },
         ...options,
-        headers,
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error?.message || "Airtable API error");
+        const errorText = await response.text();
+        throw new Error(`API error: ${response.status} - ${errorText}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || "API request failed");
+      }
+
+      return data;
     } catch (error) {
-      console.error("Airtable API Error:", error);
+      console.error("API Request Error:", error);
       throw error;
     }
   }
@@ -44,12 +46,12 @@ class AirtableAPI {
    * Get all active RFPs
    */
   async getActiveRFPs() {
-    const formula = encodeURIComponent(
-      "AND({Status} = 'Active', IS_AFTER({Submission Deadline}, NOW()))"
-    );
-    const data = await this.request(
-      `${this.tables.rfps}?filterByFormula=${formula}&sort[0][field]=Submission Deadline&sort[0][direction]=asc`
-    );
+    const data = await this.apiRequest("airtable", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "getActiveRFPs",
+      }),
+    });
     return data.records;
   }
 
@@ -57,17 +59,26 @@ class AirtableAPI {
    * Get a single RFP by ID
    */
   async getRFP(recordId) {
-    const data = await this.request(`${this.tables.rfps}/${recordId}`);
-    return data;
+    const data = await this.apiRequest("airtable", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "getRFP",
+        recordId: recordId,
+      }),
+    });
+    return data.record;
   }
 
   /**
    * Get all RFPs (for admin)
    */
   async getAllRFPs() {
-    const data = await this.request(
-      `${this.tables.rfps}?sort[0][field]=Created Date&sort[0][direction]=desc`
-    );
+    const data = await this.apiRequest("airtable", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "getAllRFPs",
+      }),
+    });
     return data.records;
   }
 
@@ -75,59 +86,58 @@ class AirtableAPI {
    * Create a new RFP
    */
   async createRFP(fields) {
-    const data = await this.request(this.tables.rfps, {
+    const data = await this.apiRequest("airtable", {
       method: "POST",
       body: JSON.stringify({
-        fields: fields,
+        action: "createRFP",
+        table: "rfps",
+        data: fields,
       }),
     });
-    return data;
+    return data.record;
   }
 
   /**
    * Update an RFP
    */
   async updateRFP(recordId, fields) {
-    const data = await this.request(`${this.tables.rfps}/${recordId}`, {
-      method: "PATCH",
+    const data = await this.apiRequest("airtable", {
+      method: "POST",
       body: JSON.stringify({
-        fields: fields,
+        action: "updateRFP",
+        recordId: recordId,
+        data: fields,
       }),
     });
-    return data;
-  }
-
-  /**
-   * Delete an RFP
-   */
-  async deleteRFP(recordId) {
-    const data = await this.request(`${this.tables.rfps}/${recordId}`, {
-      method: "DELETE",
-    });
-    return data;
+    return data.record;
   }
 
   /**
    * Submit a bid
    */
   async submitBid(fields) {
-    const data = await this.request(this.tables.submissions, {
+    const data = await this.apiRequest("airtable", {
       method: "POST",
       body: JSON.stringify({
-        fields: fields,
+        action: "submitBid",
+        table: "submissions",
+        data: fields,
       }),
     });
-    return data;
+    return data.record;
   }
 
   /**
    * Get all submissions for an RFP
    */
   async getSubmissionsByRFP(rfpRecordId) {
-    const formula = encodeURIComponent(`{RFP} = '${rfpRecordId}'`);
-    const data = await this.request(
-      `${this.tables.submissions}?filterByFormula=${formula}&sort[0][field]=Submitted Date&sort[0][direction]=desc`
-    );
+    const data = await this.apiRequest("airtable", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "getSubmissionsByRFP",
+        rfpRecordId: rfpRecordId,
+      }),
+    });
     return data.records;
   }
 
@@ -135,9 +145,12 @@ class AirtableAPI {
    * Get all submissions (for admin)
    */
   async getAllSubmissions() {
-    const data = await this.request(
-      `${this.tables.submissions}?sort[0][field]=Submitted Date&sort[0][direction]=desc`
-    );
+    const data = await this.apiRequest("airtable", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "getAllSubmissions",
+      }),
+    });
     return data.records;
   }
 
@@ -145,22 +158,27 @@ class AirtableAPI {
    * Update submission (for admin reviews)
    */
   async updateSubmission(recordId, fields) {
-    const data = await this.request(`${this.tables.submissions}/${recordId}`, {
-      method: "PATCH",
+    const data = await this.apiRequest("airtable", {
+      method: "POST",
       body: JSON.stringify({
-        fields: fields,
+        action: "updateSubmission",
+        recordId: recordId,
+        data: fields,
       }),
     });
-    return data;
+    return data.record;
   }
 
   /**
    * Get all vendors
    */
   async getVendors() {
-    const data = await this.request(
-      `${this.tables.vendors}?sort[0][field]=Vendor Name&sort[0][direction]=asc`
-    );
+    const data = await this.apiRequest("airtable", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "getVendors",
+      }),
+    });
     return data.records;
   }
 
@@ -168,46 +186,52 @@ class AirtableAPI {
    * Create a vendor
    */
   async createVendor(fields) {
-    console.log("Creating vendor in Airtable...", fields);
+    console.log("Creating vendor via serverless function...", fields);
 
-    const data = await this.request(this.tables.vendors, {
+    const data = await this.apiRequest("airtable", {
       method: "POST",
       body: JSON.stringify({
-        fields: fields,
+        action: "createVendor",
+        table: "vendors",
+        data: fields,
       }),
     });
 
-    console.log("Airtable createVendor response:", data);
-    return data;
+    console.log("Serverless createVendor response:", data);
+    return data.record;
   }
 
   /**
    * Update a vendor
    */
   async updateVendor(recordId, fields) {
-    const data = await this.request(`${this.tables.vendors}/${recordId}`, {
-      method: "PATCH",
+    const data = await this.apiRequest("airtable", {
+      method: "POST",
       body: JSON.stringify({
-        fields: fields,
+        action: "updateVendor",
+        recordId: recordId,
+        data: fields,
       }),
     });
-    return data;
+    return data.record;
   }
 
   /**
    * Get vendor by email
    */
   async getVendorByEmail(email) {
-    const formula = encodeURIComponent(`{Email} = '${email}'`);
-    const data = await this.request(
-      `${this.tables.vendors}?filterByFormula=${formula}`
-    );
-    return data.records.length > 0 ? data.records[0] : null;
+    const data = await this.apiRequest("airtable", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "getVendorByEmail",
+        email: email,
+      }),
+    });
+    return data.record;
   }
 
   /**
-   * Upload file to Airtable (requires attachment field)
-   * Note: Files must be uploaded to a temporary URL first, then passed to Airtable
+   * Upload file to Airtable (via Cloudinary)
    */
   async uploadAttachment(url, filename) {
     return [
@@ -222,28 +246,13 @@ class AirtableAPI {
    * Get dashboard statistics
    */
   async getDashboardStats() {
-    const [rfps, submissions, vendors] = await Promise.all([
-      this.getAllRFPs(),
-      this.getAllSubmissions(),
-      this.getVendors(),
-    ]);
-
-    const activeRFPs = rfps.filter((r) => r.fields.Status === "Active").length;
-    const totalSubmissions = submissions.length;
-    const pendingReviews = submissions.filter(
-      (s) => s.fields["Review Status"] === "Pending"
-    ).length;
-    const shortlisted = submissions.filter(
-      (s) => s.fields["Review Status"] === "Shortlisted"
-    ).length;
-
-    return {
-      activeRFPs,
-      totalSubmissions,
-      pendingReviews,
-      shortlisted,
-      totalVendors: vendors.length,
-    };
+    const data = await this.apiRequest("airtable", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "getDashboardStats",
+      }),
+    });
+    return data.stats;
   }
 }
 

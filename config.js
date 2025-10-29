@@ -1,12 +1,11 @@
 // Configuration file for RFP System
-// Copy this to config.js and add your actual credentials
+// Uses environment variables only - no hardcoded secrets
 
 const CONFIG = {
   // Airtable Configuration
   airtable: {
-    baseId: "appIHQ8c0j2Y7decy", // Get from Airtable
-    apiKey:
-      "patiwPNTJ6yPlYHpz.b9998e5ce75b88d23a972bb0418d9d8d29e1d12d19c428e31a9f2b9f19882f7d", // Get from Airtable developer settings
+    baseId: process.env.AIRTABLE_BASE_ID,
+    apiKey: process.env.AIRTABLE_API_KEY,
     tables: {
       rfps: "RFPs",
       vendors: "Vendors",
@@ -17,24 +16,23 @@ const CONFIG = {
 
   // Cloudinary Configuration (for NDA file uploads)
   cloudinary: {
-    cloudName: "djwuqsy1o", // Get from Cloudinary dashboard
-    uploadPreset: "atlas_rfp_nda", // Create unsigned upload preset in Cloudinary
-    // Optional: API key and secret (not needed for unsigned uploads)
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    uploadPreset: process.env.CLOUDINARY_UPLOAD_PRESET,
   },
 
-  // Admin Authentication (Change these!)
+  // Admin Authentication
   admin: {
-    username: "admin",
-    password: "Dan@atlas55", // CHANGE THIS!
+    username: process.env.ADMIN_USERNAME,
+    password: process.env.ADMIN_PASSWORD,
   },
 
   // Company Branding
   branding: {
-    companyName: "Atlas Consulting",
-    logoUrl: "/assets/images/logo.png", // Add your logo
-    primaryColor: "#2563eb", // Blue
-    secondaryColor: "#1e40af",
-    accentColor: "#3b82f6",
+    companyName: process.env.COMPANY_NAME || "Atlas Consulting",
+    logoUrl: "/assets/images/logo.png",
+    primaryColor: process.env.PRIMARY_COLOR || "#2563eb",
+    secondaryColor: process.env.SECONDARY_COLOR || "#1e40af",
+    accentColor: process.env.ACCENT_COLOR || "#3b82f6",
   },
 
   // Email Configuration (Optional - for notifications)
