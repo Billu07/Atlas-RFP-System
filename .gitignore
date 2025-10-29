@@ -1,4 +1,5 @@
 # Sensitive configuration
+config.example.js
 config.js
 
 # Dependencies

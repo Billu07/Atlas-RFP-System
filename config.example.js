@@ -4,9 +4,8 @@
 const CONFIG = {
   // Airtable Configuration
   airtable: {
-    baseId: "appIHQ8c0j2Y7decy", // Get from Airtable
-    apiKey:
-      "patiwPNTJ6yPlYHpz.b9998e5ce75b88d23a972bb0418d9d8d29e1d12d19c428e31a9f2b9f19882f7d", // Get from Airtable developer settings
+    baseId: "", // Get from Airtable
+    apiKey: "", // Get from Airtable developer settings
     tables: {
       rfps: "RFPs",
       vendors: "Vendors",
@@ -17,15 +16,15 @@ const CONFIG = {
 
   // Cloudinary Configuration (for NDA file uploads)
   cloudinary: {
-    cloudName: "djwuqsy1o", // Get from Cloudinary dashboard
-    uploadPreset: "atlas_rfp_nda", // Create unsigned upload preset in Cloudinary
+    cloudName: "", // Get from Cloudinary dashboard
+    uploadPreset: "", // Create unsigned upload preset in Cloudinary
     // Optional: API key and secret (not needed for unsigned uploads)
   },
 
   // Admin Authentication (Change these!)
   admin: {
-    username: "admin",
-    password: "Dan@atlas55", // CHANGE THIS!
+    username: "",
+    password: "", // CHANGE THIS!
   },
 
   // Company Branding
