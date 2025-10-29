@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vendor Dashboard | Atlas RFP Portal</title>
-    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="../assets/css/main.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -17,9 +17,9 @@
     <header class="header">
       <div class="container">
         <div class="header-content">
-          <a href="/vendor/dashboard.html" class="logo">
+          <a href="dashboard.html" class="logo">
             <img
-              src="/assets/images/logo.png"
+              src="../assets/images/logo.png"
               alt="Atlas Consulting"
               onerror="this.style.display='none'"
             />
@@ -33,9 +33,9 @@
                 ></span>
               </li>
               <li>
-                <a href="/vendor/dashboard.html" class="active">Dashboard</a>
+                <a href="dashboard.html" class="active">Dashboard</a>
               </li>
-              <li><a href="/vendor/my-submissions.html">My Submissions</a></li>
+              <li><a href="my-submissions.html">My Submissions</a></li>
               <li>
                 <button class="btn btn-sm btn-ghost" onclick="logout()">
                   Logout
@@ -186,8 +186,8 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="/config.js"></script>
-    <script src="/assets/js/airtable-api.js"></script>
+    <script src="../config.js"></script>
+    <script src="../assets/js/airtable-api.js"></script>
     <script>
       let airtableAPI;
       let vendorId;
@@ -205,7 +205,7 @@
         const loginTime = sessionStorage.getItem("vendor_login_time");
 
         if (!isAuthenticated || !loginTime) {
-          window.location.href = "/vendor/login.html";
+          window.location.href = "login.html";
           return;
         }
 
@@ -354,7 +354,7 @@
             ${
               hasSubmitted
                 ? `<button class="btn btn-secondary" disabled>Already Submitted</button>`
-                : `<a href="/vendor/rfp-detail.html?id=${rfp.id}" class="btn btn-primary">
+                : `<a href="rfp-detail.html?id=${rfp.id}" class="btn btn-primary">
                 View Details & Submit
               </a>`
             }
@@ -379,7 +379,7 @@
         sessionStorage.removeItem("vendor_name");
         sessionStorage.removeItem("vendor_email");
         sessionStorage.removeItem("vendor_login_time");
-        window.location.href = "/vendor/login.html";
+        window.location.href = "login.html";
       }
 
       // Utility functions

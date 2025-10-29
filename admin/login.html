@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Login | Atlas RFP System</title>
-    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="../assets/css/main.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -112,14 +112,16 @@
             border-top: 1px solid var(--border-color);
           "
         >
-          <a href="/" style="color: var(--text-light); font-size: 0.875rem"
+          <a
+            href="../index.html"
+            style="color: var(--text-light); font-size: 0.875rem"
             >← Back to Public Portal</a
           >
         </div>
       </div>
     </div>
 
-    <script src="/config.js"></script>
+    <script src="../config.js"></script>
     <script>
       document.getElementById("login-form").addEventListener("submit", (e) => {
         e.preventDefault();
@@ -147,7 +149,7 @@
             sessionStorage.setItem("admin_login_time", Date.now());
 
             // Redirect to dashboard
-            window.location.href = "/admin/dashboard.html";
+            window.location.href = "dashboard.html";
           } else {
             loginError.textContent = "Invalid username or password";
             loginError.classList.remove("hidden");

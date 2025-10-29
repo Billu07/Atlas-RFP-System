@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vendor Login | Atlas RFP Portal</title>
-    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="../assets/css/main.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -121,25 +121,23 @@
           >
             Don't have an account?
           </p>
-          <a
-            href="/vendor/signup.html"
-            class="btn btn-outline"
-            style="width: 100%"
-          >
+          <a href="signup.html" class="btn btn-outline" style="width: 100%">
             Register as Vendor
           </a>
         </div>
 
         <div style="text-align: center; margin-top: 1.5rem">
-          <a href="/" style="color: var(--text-light); font-size: 0.875rem"
+          <a
+            href="../index.html"
+            style="color: var(--text-light); font-size: 0.875rem"
             >← Back to Home</a
           >
         </div>
       </div>
     </div>
 
-    <script src="/config.js"></script>
-    <script src="/assets/js/airtable-api.js"></script>
+    <script src="../config.js"></script>
+    <script src="../assets/js/airtable-api.js"></script>
     <script>
       let airtableAPI;
 
@@ -204,7 +202,7 @@
             sessionStorage.setItem("vendor_login_time", Date.now());
 
             // Redirect to vendor dashboard
-            window.location.href = "/vendor/dashboard.html";
+            window.location.href = "dashboard.html";
           } catch (error) {
             loginError.textContent = error.message;
             loginError.classList.remove("hidden");

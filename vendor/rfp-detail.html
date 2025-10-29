@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RFP Details | Atlas RFP Portal</title>
-    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="../assets/css/main.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -17,9 +17,9 @@
     <header class="header">
       <div class="container">
         <div class="header-content">
-          <a href="/vendor/dashboard.html" class="logo">
+          <a href="dashboard.html" class="logo">
             <img
-              src="/assets/images/logo.png"
+              src="../assets/images/logo.png"
               alt="Atlas Consulting"
               onerror="this.style.display='none'"
             />
@@ -27,7 +27,7 @@
           </a>
           <nav>
             <ul class="nav-links">
-              <li><a href="/vendor/dashboard.html">← Back to Dashboard</a></li>
+              <li><a href="dashboard.html">← Back to Dashboard</a></li>
             </ul>
           </nav>
         </div>
@@ -58,7 +58,9 @@
         <div class="card" style="border-left: 4px solid var(--error-color)">
           <h3>RFP Not Found</h3>
           <p>The requested RFP could not be found or is no longer active.</p>
-          <a href="/" class="btn btn-primary mt-2">Back to Active RFPs</a>
+          <a href="dashboard.html" class="btn btn-primary mt-2"
+            >Back to Active RFPs</a
+          >
         </div>
       </div>
 
@@ -405,8 +407,8 @@
     </main>
 
     <!-- Scripts -->
-    <script src="/config.js"></script>
-    <script src="/assets/js/airtable-api.js"></script>
+    <script src="../config.js"></script>
+    <script src="../assets/js/airtable-api.js"></script>
     <script>
       let airtableAPI;
       let currentRFP = null;
@@ -417,7 +419,7 @@
         const isAuthenticated = sessionStorage.getItem("vendor_authenticated");
         if (!isAuthenticated) {
           alert("Please log in to access RFPs");
-          window.location.href = "/vendor/login.html";
+          window.location.href = "login.html";
           return false;
         }
         vendorEmail = sessionStorage.getItem("vendor_email");
