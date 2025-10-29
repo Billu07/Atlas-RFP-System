@@ -92,6 +92,9 @@ function switchView(view) {
     case "vendors":
       loadVendors();
       break;
+    case "pending-vendors":
+      loadPendingVendors();
+      break;
   }
 }
 
@@ -315,6 +318,284 @@ async function loadSubmissions() {
 }
 
 // Load all vendors
+async function loadVendors() {
+  const container = document.getElementById("vendors-table");
+  container.innerHTML =
+    '<p class="text-center" style="padding: 2rem;">Loading...</p>';
+
+  try {
+    const vendors = await airtableAPI.getVendors();
+
+    // Filter out pending vendors (they're in another view)
+    const approvedVendors = vendors.filter(
+      (v) => v.fields["Status"] !== "Pending Approval"
+    );
+
+    if (approvedVendors.length === 0) {
+      container.innerHTML =
+        '<p class="text-center" style="padding: 2rem; color: var(--text-light);">No approved vendors yet</p>';
+      return;
+    }
+
+    const table = `
+      <table>
+        <thead>
+          <tr>
+            <th>Vendor Name</th>
+            <th>Contact</th>
+            <th>Email</th>
+            <th>Country</th>
+            <th>Status</th>
+            <th>NDA</th>
+            <th>Registered</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${approvedVendors
+            .map((vendor) => {
+              const fields = vendor.fields;
+              return `
+              <tr>
+                <td><strong>${escapeHtml(fields["Vendor Name"])}</strong></td>
+                <td>${escapeHtml(fields["Contact Person"] || "N/A")}</td>
+                <td>${escapeHtml(fields["Email"])}</td>
+                <td>${escapeHtml(fields["Country"] || "N/A")}</td>
+                <td><span class="badge badge-${getStatusBadgeClass(
+                  fields["Status"]
+                )}">${fields["Status"] || "Not Invited"}</span></td>
+                <td>${fields["NDA on File"] ? "✓" : "✗"}</td>
+                <td>${formatDate(new Date(fields["Date Added"]))}</td>
+                <td>
+                  <button class="btn btn-sm btn-ghost" onclick="viewVendorDetails('${
+                    vendor.id
+                  }')">View</button>
+                  <button class="btn btn-sm btn-ghost" onclick="editVendor('${
+                    vendor.id
+                  }')">Edit</button>
+                </td>
+              </tr>
+            `;
+            })
+            .join("")}
+        </tbody>
+      </table>
+    `;
+
+    container.innerHTML = table;
+  } catch (error) {
+    console.error("Error loading vendors:", error);
+    container.innerHTML =
+      '<p class="text-center" style="padding: 2rem; color: var(--error-color);">Error loading vendors</p>';
+  }
+}
+
+// Load pending vendor approvals
+async function loadPendingVendors() {
+  const container = document.getElementById("pending-vendors-table");
+  const pendingAlert = document.getElementById("pending-alert");
+  const pendingCount = document.getElementById("pending-count");
+
+  container.innerHTML =
+    '<p class="text-center" style="padding: 2rem;">Loading...</p>';
+
+  try {
+    const vendors = await airtableAPI.getVendors();
+    const pendingVendors = vendors.filter(
+      (v) => v.fields["Status"] === "Pending Approval"
+    );
+
+    pendingCount.textContent = pendingVendors.length;
+
+    if (pendingVendors.length > 0) {
+      pendingAlert.classList.remove("hidden");
+    } else {
+      pendingAlert.classList.add("hidden");
+    }
+
+    if (pendingVendors.length === 0) {
+      container.innerHTML =
+        '<p class="text-center" style="padding: 2rem; color: var(--text-light);">No pending vendor approvals</p>';
+      return;
+    }
+
+    const table = `
+      <table>
+        <thead>
+          <tr>
+            <th>Vendor Name</th>
+            <th>Contact</th>
+            <th>Email</th>
+            <th>Country</th>
+            <th>NDA File</th>
+            <th>Registered</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pendingVendors
+            .map((vendor) => {
+              const fields = vendor.fields;
+              return `
+              <tr>
+                <td><strong>${escapeHtml(fields["Vendor Name"])}</strong></td>
+                <td>
+                  ${escapeHtml(fields["Contact Person"])}
+                  ${
+                    fields["Contact Title"]
+                      ? `<br><small style="color: var(--text-light);">${escapeHtml(
+                          fields["Contact Title"]
+                        )}</small>`
+                      : ""
+                  }
+                </td>
+                <td>${escapeHtml(
+                  fields["Email"]
+                )}<br><small style="color: var(--text-light);">${escapeHtml(
+                fields["Phone"] || "No phone"
+              )}</small></td>
+                <td>${escapeHtml(
+                  fields["Country"] || "N/A"
+                )}<br><small style="color: var(--text-light);">${escapeHtml(
+                fields["Company Size"] || ""
+              )}</small></td>
+                <td>
+                  ${
+                    fields["NDA File Name"]
+                      ? `<div style="color: var(--success-color);">✓ ${escapeHtml(
+                          fields["NDA File Name"]
+                        )}</div>`
+                      : '<div style="color: var(--error-color);">✗ No file</div>'
+                  }
+                </td>
+                <td>${formatDate(new Date(fields["Date Added"]))}</td>
+                <td>
+                  <button class="btn btn-sm btn-primary" onclick="approveVendor('${
+                    vendor.id
+                  }')">Approve</button>
+                  <button class="btn btn-sm btn-ghost" onclick="viewVendorDetails('${
+                    vendor.id
+                  }')">View</button>
+                  <button class="btn btn-sm" style="background: var(--error-color); color: white;" onclick="declineVendor('${
+                    vendor.id
+                  }')">Decline</button>
+                </td>
+              </tr>
+            `;
+            })
+            .join("")}
+        </tbody>
+      </table>
+    `;
+
+    container.innerHTML = table;
+  } catch (error) {
+    console.error("Error loading pending vendors:", error);
+    container.innerHTML =
+      '<p class="text-center" style="padding: 2rem; color: var(--error-color);">Error loading pending vendors</p>';
+  }
+}
+
+// Approve vendor
+async function approveVendor(vendorId) {
+  if (
+    !confirm("Approve this vendor? They will gain access to all active RFPs.")
+  ) {
+    return;
+  }
+
+  try {
+    await airtableAPI.updateVendor(vendorId, {
+      Status: "Approved",
+      "Approval Date": new Date().toISOString().split("T")[0],
+    });
+
+    alert("Vendor approved successfully! They can now log in and access RFPs.");
+    loadPendingVendors();
+
+    // TODO: Send approval email to vendor
+  } catch (error) {
+    console.error("Error approving vendor:", error);
+    alert("Error approving vendor: " + error.message);
+  }
+}
+
+// Decline vendor
+async function declineVendor(vendorId) {
+  const reason = prompt(
+    "Reason for declining (will be stored in internal notes):"
+  );
+  if (!reason) return;
+
+  try {
+    const vendor = await airtableAPI.request(
+      `${airtableAPI.tables.vendors}/${vendorId}`
+    );
+    const existingNotes = vendor.fields["Internal Notes"] || "";
+
+    await airtableAPI.updateVendor(vendorId, {
+      Status: "Declined",
+      "Internal Notes": existingNotes + "\n\nDECLINED: " + reason,
+    });
+
+    alert("Vendor declined.");
+    loadPendingVendors();
+  } catch (error) {
+    console.error("Error declining vendor:", error);
+    alert("Error declining vendor: " + error.message);
+  }
+}
+
+// View vendor details
+async function viewVendorDetails(vendorId) {
+  try {
+    const vendor = await airtableAPI.request(
+      `${airtableAPI.tables.vendors}/${vendorId}`
+    );
+    const fields = vendor.fields;
+
+    const details = `
+VENDOR INFORMATION
+──────────────────────────────────────────
+Company: ${fields["Vendor Name"]}
+Contact: ${fields["Contact Person"]} ${
+      fields["Contact Title"] ? "(" + fields["Contact Title"] + ")" : ""
+    }
+Email: ${fields["Email"]}
+Phone: ${fields["Phone"] || "N/A"}
+Website: ${fields["Website"] || "N/A"}
+Country: ${fields["Country"] || "N/A"}
+Company Size: ${fields["Company Size"] || "N/A"}
+
+Services/Expertise:
+${fields["Services"] || "Not provided"}
+
+NDA STATUS
+──────────────────────────────────────────
+NDA on File: ${fields["NDA on File"] ? "Yes" : "No"}
+File Name: ${fields["NDA File Name"] || "N/A"}
+Upload Date: ${fields["NDA Upload Date"] || "N/A"}
+
+ACCOUNT STATUS
+──────────────────────────────────────────
+Status: ${fields["Status"]}
+Registered: ${formatDate(new Date(fields["Date Added"]))}
+Approved: ${fields["Approval Date"] || "Not approved"}
+Last Login: ${fields["Last Login"] || "Never"}
+
+INTERNAL NOTES
+──────────────────────────────────────────
+${fields["Internal Notes"] || "No notes"}
+    `;
+
+    alert(details);
+  } catch (error) {
+    console.error("Error viewing vendor:", error);
+    alert("Error loading vendor details");
+  }
+}
+
+// Load all vendors (original function)
 async function loadVendors() {
   const container = document.getElementById("vendors-table");
   container.innerHTML =
@@ -596,4 +877,95 @@ function editVendor(recordId) {
 function viewRFPSubmissions(recordId) {
   alert("View RFP Submissions: Filter submissions table by this RFP");
   // You can implement this by switching to submissions view with a filter
+}
+
+// Vendor approval functions
+async function approveVendor(vendorId) {
+  if (
+    !confirm(
+      "Approve this vendor? They will be able to access RFPs and submit proposals."
+    )
+  ) {
+    return;
+  }
+
+  try {
+    await airtableAPI.updateVendor(vendorId, {
+      Status: "Approved",
+      "Approval Date": new Date().toISOString().split("T")[0],
+    });
+
+    alert(
+      "Vendor approved! They will receive an email notification (if configured)."
+    );
+    loadVendors();
+  } catch (error) {
+    console.error("Error approving vendor:", error);
+    alert("Error approving vendor");
+  }
+}
+
+async function declineVendor(vendorId) {
+  const reason = prompt("Reason for declining (optional):");
+
+  if (!confirm("Decline this vendor application?")) {
+    return;
+  }
+
+  try {
+    const updateData = {
+      Status: "Declined",
+    };
+
+    if (reason) {
+      updateData["Internal Notes"] = "Declined: " + reason;
+    }
+
+    await airtableAPI.updateVendor(vendorId, updateData);
+
+    alert("Vendor declined.");
+    loadVendors();
+  } catch (error) {
+    console.error("Error declining vendor:", error);
+    alert("Error declining vendor");
+  }
+}
+
+async function viewVendor(vendorId) {
+  try {
+    const response = await airtableAPI.request(
+      `${airtableAPI.tables.vendors}/${vendorId}`
+    );
+    const fields = response.fields;
+
+    const details = `
+Company: ${fields["Vendor Name"]}
+Contact: ${fields["Contact Person"]} (${fields["Contact Title"] || "N/A"})
+Email: ${fields["Email"]}
+Phone: ${fields["Phone"] || "N/A"}
+Website: ${fields["Website"] || "N/A"}
+Country: ${fields["Country"] || "N/A"}
+Company Size: ${fields["Company Size"] || "N/A"}
+
+Services/Expertise:
+${fields["Services"] || "N/A"}
+
+Registration Date: ${
+      fields["Date Added"] ? formatDate(new Date(fields["Date Added"])) : "N/A"
+    }
+NDA on File: ${fields["NDA on File"] ? "Yes" : "No"}
+NDA Upload Date: ${fields["NDA Upload Date"] || "N/A"}
+Status: ${fields["Status"] || "N/A"}
+Approval Date: ${fields["Approval Date"] || "N/A"}
+Last Login: ${fields["Last Login"] || "Never"}
+
+Internal Notes:
+${fields["Internal Notes"] || "None"}
+    `;
+
+    alert(details);
+  } catch (error) {
+    console.error("Error viewing vendor:", error);
+    alert("Error loading vendor details");
+  }
 }

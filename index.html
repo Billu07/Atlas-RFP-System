@@ -27,10 +27,12 @@
           </a>
           <nav>
             <ul class="nav-links">
-              <li><a href="/" class="active">Active RFPs</a></li>
+              <li><a href="/" class="active">Home</a></li>
+              <li><a href="/vendor/signup.html">Vendor Sign Up</a></li>
+              <li><a href="/vendor/login.html">Vendor Login</a></li>
               <li>
                 <a href="/admin/login.html" class="btn btn-sm btn-outline"
-                  >Admin Login</a
+                  >Admin</a
                 >
               </li>
             </ul>
@@ -44,73 +46,206 @@
       <div class="container">
         <h1>Request for Proposals</h1>
         <p>
-          Welcome to Atlas Consulting's RFP portal. Browse active opportunities
-          and submit your proposals below.
+          Welcome to Atlas Consulting's RFP portal. Register as a vendor to
+          access RFPs and submit proposals.
         </p>
+        <div style="margin-top: 2rem">
+          <a
+            href="/vendor/signup.html"
+            class="btn"
+            style="
+              background: white;
+              color: var(--primary-color);
+              padding: 1rem 2rem;
+              font-weight: 600;
+            "
+          >
+            Register as Vendor →
+          </a>
+          <a
+            href="/vendor/login.html"
+            class="btn btn-ghost"
+            style="
+              color: white;
+              border: 2px solid white;
+              padding: 1rem 2rem;
+              margin-left: 1rem;
+            "
+          >
+            Vendor Login
+          </a>
+        </div>
       </div>
     </section>
 
     <!-- Main Content -->
     <main class="container" style="padding: 3rem 1.5rem">
-      <!-- Loading State -->
-      <div id="loading" class="text-center" style="padding: 3rem 0">
-        <div
-          class="spinner"
-          style="
-            width: 40px;
-            height: 40px;
-            border-width: 4px;
-            border-color: var(--primary-color);
-            border-top-color: var(--border-color);
-            margin: 0 auto;
-          "
-        ></div>
-        <p style="margin-top: 1rem; color: var(--text-light)">
-          Loading active RFPs...
-        </p>
-      </div>
-
-      <!-- Error State -->
-      <div id="error" class="hidden">
-        <div class="card" style="border-left: 4px solid var(--error-color)">
-          <h3>Unable to Load RFPs</h3>
-          <p id="error-message">
-            There was an error loading the RFPs. Please check your configuration
-            and try again.
+      <!-- Information Section -->
+      <div
+        class="card"
+        style="max-width: 800px; margin: 0 auto; text-align: center"
+      >
+        <div class="card-body" style="padding: 3rem">
+          <div
+            style="
+              width: 80px;
+              height: 80px;
+              background: var(--bg-tertiary);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 2rem;
+              font-size: 2.5rem;
+            "
+          >
+            🔒
+          </div>
+          <h2 style="margin-bottom: 1rem">RFPs Are Protected</h2>
+          <p
+            style="
+              color: var(--text-secondary);
+              font-size: 1.125rem;
+              margin-bottom: 2rem;
+            "
+          >
+            Our RFPs contain confidential project details and are only
+            accessible to registered and approved vendors who have signed our
+            Non-Disclosure Agreement.
           </p>
-          <button class="btn btn-primary mt-2" onclick="loadRFPs()">
-            Retry
-          </button>
+
+          <div
+            class="card"
+            style="
+              background: var(--bg-tertiary);
+              text-align: left;
+              margin-bottom: 2rem;
+            "
+          >
+            <div class="card-body">
+              <h3 style="margin-bottom: 1rem">📋 How to Access RFPs:</h3>
+              <ol style="margin-left: 1.5rem; line-height: 1.8">
+                <li>
+                  <strong>Register:</strong> Complete the vendor registration
+                  form
+                </li>
+                <li>
+                  <strong>NDA:</strong> Download, sign, and upload our
+                  Non-Disclosure Agreement
+                </li>
+                <li>
+                  <strong>Wait for Approval:</strong> Our team reviews your
+                  registration (typically 1-2 business days)
+                </li>
+                <li>
+                  <strong>Get Notified:</strong> Receive email confirmation once
+                  approved
+                </li>
+                <li>
+                  <strong>Access Portal:</strong> Log in to view all active RFPs
+                  and submit proposals
+                </li>
+              </ol>
+            </div>
+          </div>
+
+          <div
+            class="card"
+            style="
+              background: var(--bg-secondary);
+              text-align: left;
+              margin-bottom: 2rem;
+            "
+          >
+            <div class="card-body">
+              <h3 style="margin-bottom: 1rem">✅ What You'll Get:</h3>
+              <ul style="margin-left: 1.5rem; line-height: 1.8">
+                <li>Access to detailed RFP requirements and specifications</li>
+                <li>
+                  Secure portal for viewing confidential project information
+                </li>
+                <li>Ability to submit proposals online</li>
+                <li>Track your submission status in real-time</li>
+                <li>Receive notifications about new opportunities</li>
+                <li>Direct communication channel with our team</li>
+              </ul>
+            </div>
+          </div>
+
+          <div
+            style="
+              display: flex;
+              gap: 1rem;
+              justify-content: center;
+              flex-wrap: wrap;
+            "
+          >
+            <a href="/vendor/signup.html" class="btn btn-primary btn-lg">
+              🚀 Register as Vendor
+            </a>
+            <a href="/vendor/login.html" class="btn btn-outline btn-lg">
+              Already Registered? Login
+            </a>
+          </div>
+
+          <p
+            style="
+              margin-top: 2rem;
+              color: var(--text-light);
+              font-size: 0.875rem;
+            "
+          >
+            Questions about the registration process?
+            <a
+              href="mailto:rfp@atlasconsulting.com"
+              style="color: var(--primary-color)"
+              >Contact us</a
+            >
+          </p>
         </div>
       </div>
 
-      <!-- Empty State -->
-      <div id="empty" class="hidden text-center" style="padding: 3rem 0">
-        <svg
-          width="64"
-          height="64"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          style="margin: 0 auto; color: var(--text-light)"
-        >
-          <path
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          />
-        </svg>
-        <h3 style="margin-top: 1rem">No Active RFPs</h3>
-        <p style="color: var(--text-light)">
-          There are currently no active requests for proposals. Please check
-          back later.
-        </p>
-      </div>
+      <!-- Why Register Section -->
+      <div
+        class="grid grid-3"
+        style="
+          margin-top: 4rem;
+          max-width: 1000px;
+          margin-left: auto;
+          margin-right: auto;
+        "
+      >
+        <div class="card text-center">
+          <div class="card-body">
+            <div style="font-size: 2.5rem; margin-bottom: 1rem">🔐</div>
+            <h3 style="margin-bottom: 0.5rem">Secure & Confidential</h3>
+            <p style="color: var(--text-secondary)">
+              All RFPs are protected behind NDA and only accessible to approved
+              vendors.
+            </p>
+          </div>
+        </div>
 
-      <!-- RFP List -->
-      <div id="rfp-list" class="hidden">
-        <h2 style="margin-bottom: 2rem">Active Opportunities</h2>
-        <div id="rfp-grid" class="grid grid-2">
-          <!-- RFP cards will be inserted here -->
+        <div class="card text-center">
+          <div class="card-body">
+            <div style="font-size: 2.5rem; margin-bottom: 1rem">⚡</div>
+            <h3 style="margin-bottom: 0.5rem">Fast Approval</h3>
+            <p style="color: var(--text-secondary)">
+              Most registrations are reviewed and approved within 1-2 business
+              days.
+            </p>
+          </div>
+        </div>
+
+        <div class="card text-center">
+          <div class="card-body">
+            <div style="font-size: 2.5rem; margin-bottom: 1rem">📊</div>
+            <h3 style="margin-bottom: 0.5rem">Track Everything</h3>
+            <p style="color: var(--text-secondary)">
+              Monitor your submissions, receive updates, and manage all
+              proposals in one place.
+            </p>
+          </div>
         </div>
       </div>
     </main>
@@ -133,146 +268,10 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="/config.js"></script>
-    <script src="/assets/js/airtable-api.js"></script>
     <script>
-      // Initialize Airtable API
-      let airtableAPI;
-
-      // Load RFPs on page load
-      document.addEventListener("DOMContentLoaded", async () => {
-        try {
-          // Check if config is loaded
-          if (typeof CONFIG === "undefined") {
-            throw new Error(
-              "Configuration not found. Please create config.js from config.example.js"
-            );
-          }
-
-          // Initialize API
-          airtableAPI = new AirtableAPI(CONFIG);
-
-          // Load RFPs
-          await loadRFPs();
-        } catch (error) {
-          console.error("Initialization error:", error);
-          showError(error.message);
-        }
-      });
-
-      // Load active RFPs
-      async function loadRFPs() {
-        const loading = document.getElementById("loading");
-        const error = document.getElementById("error");
-        const empty = document.getElementById("empty");
-        const rfpList = document.getElementById("rfp-list");
-
-        // Reset states
-        loading.classList.remove("hidden");
-        error.classList.add("hidden");
-        empty.classList.add("hidden");
-        rfpList.classList.add("hidden");
-
-        try {
-          const rfps = await airtableAPI.getActiveRFPs();
-
-          loading.classList.add("hidden");
-
-          if (rfps.length === 0) {
-            empty.classList.remove("hidden");
-          } else {
-            rfpList.classList.remove("hidden");
-            renderRFPs(rfps);
-          }
-        } catch (err) {
-          console.error("Error loading RFPs:", err);
-          loading.classList.add("hidden");
-          showError(err.message);
-        }
-      }
-
-      // Render RFP cards
-      function renderRFPs(rfps) {
-        const grid = document.getElementById("rfp-grid");
-        grid.innerHTML = "";
-
-        rfps.forEach((rfp) => {
-          const fields = rfp.fields;
-          const deadline = new Date(fields["Submission Deadline"]);
-          const daysLeft = Math.ceil(
-            (deadline - new Date()) / (1000 * 60 * 60 * 24)
-          );
-
-          const card = document.createElement("div");
-          card.className = "card";
-          card.innerHTML = `
-          <div class="card-header">
-            <div>
-              <div class="card-title">${escapeHtml(fields["RFP Name"])}</div>
-              <div class="card-subtitle">RFP #${fields["RFP ID"]}</div>
-            </div>
-            <span class="badge ${
-              daysLeft <= 3 ? "badge-warning" : "badge-success"
-            }">
-              ${daysLeft} day${daysLeft !== 1 ? "s" : ""} left
-            </span>
-          </div>
-          <div class="card-body">
-            <p>${escapeHtml(
-              fields["Objective"] || "No description available"
-            )}</p>
-            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-              ${
-                fields["Budget Guidance"]
-                  ? `
-                <div>
-                  <small style="color: var(--text-light); display: block;">Budget</small>
-                  <strong>${escapeHtml(fields["Budget Guidance"])}</strong>
-                </div>
-              `
-                  : ""
-              }
-              <div>
-                <small style="color: var(--text-light); display: block;">Deadline</small>
-                <strong>${formatDate(deadline)}</strong>
-              </div>
-            </div>
-          </div>
-          <div class="card-footer">
-            <a href="/public/rfp-detail.html?id=${
-              rfp.id
-            }" class="btn btn-primary">
-              View Details & Submit
-            </a>
-          </div>
-        `;
-          grid.appendChild(card);
-        });
-      }
-
-      // Show error message
-      function showError(message) {
-        const error = document.getElementById("error");
-        const errorMessage = document.getElementById("error-message");
-        errorMessage.textContent = message;
-        error.classList.remove("hidden");
-      }
-
-      // Utility: Escape HTML
-      function escapeHtml(text) {
-        const div = document.createElement("div");
-        div.textContent = text;
-        return div.innerHTML;
-      }
-
-      // Utility: Format date
-      function formatDate(date) {
-        return date.toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        });
-      }
+      // No RFP loading needed - landing page is now informational only
+      // RFPs are only accessible to approved vendors via /vendor/dashboard.html
+      console.log("Atlas RFP Portal - Landing Page");
     </script>
   </body>
 </html>

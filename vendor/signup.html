@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vendor Registration | Atlas RFP Portal</title>
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .signup-container {
+        min-height: 100vh;
+        background: var(--bg-secondary);
+        padding: 2rem 0;
+      }
+
+      .signup-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-lg);
+        padding: 3rem;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .step-indicator {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 3rem;
+        position: relative;
+      }
+
+      .step-indicator::before {
+        content: "";
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--border-color);
+        z-index: 0;
+      }
+
+      .step {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        flex: 1;
+      }
+
+      .step-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--bg-tertiary);
+        color: var(--text-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin: 0 auto 0.5rem;
+        border: 2px solid var(--border-color);
+      }
+
+      .step.active .step-circle {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+      }
+
+      .step.completed .step-circle {
+        background: var(--success-color);
+        color: white;
+        border-color: var(--success-color);
+      }
+
+      .step-label {
+        font-size: 0.875rem;
+        color: var(--text-light);
+      }
+
+      .step.active .step-label {
+        color: var(--primary-color);
+        font-weight: 600;
+      }
+
+      .form-section {
+        display: none;
+      }
+
+      .form-section.active {
+        display: block;
+      }
+
+      .nda-preview {
+        background: var(--bg-tertiary);
+        padding: 2rem;
+        border-radius: var(--radius-lg);
+        margin: 1.5rem 0;
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid var(--border-color);
+      }
+
+      .upload-area {
+        border: 2px dashed var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 3rem 2rem;
+        text-align: center;
+        transition: var(--transition);
+        cursor: pointer;
+        background: var(--bg-secondary);
+      }
+
+      .upload-area:hover {
+        border-color: var(--primary-color);
+        background: var(--bg-primary);
+      }
+
+      .upload-area.dragover {
+        border-color: var(--primary-color);
+        background: rgba(37, 99, 235, 0.05);
+      }
+
+      .file-preview {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--bg-tertiary);
+        border-radius: var(--radius-md);
+        margin-top: 1rem;
+      }
+
+      .success-message {
+        text-align: center;
+        padding: 2rem;
+      }
+
+      .success-icon {
+        width: 80px;
+        height: 80px;
+        background: var(--success-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: white;
+        font-size: 2.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="signup-container">
+      <div class="container">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 3rem">
+          <a
+            href="/"
+            class="logo"
+            style="display: inline-flex; margin-bottom: 1rem"
+          >
+            <img
+              src="/assets/images/logo.png"
+              alt="Atlas"
+              onerror="this.style.display='none'"
+              style="height: 40px"
+            />
+            <span style="font-size: 1.5rem">Atlas Consulting</span>
+          </a>
+          <h1>Vendor Registration</h1>
+          <p style="color: var(--text-light)">
+            Register to access our RFP portal and submit proposals
+          </p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="signup-card">
+          <!-- Step Indicator -->
+          <div class="step-indicator">
+            <div class="step active" data-step="1">
+              <div class="step-circle">1</div>
+              <div class="step-label">Company Info</div>
+            </div>
+            <div class="step" data-step="2">
+              <div class="step-circle">2</div>
+              <div class="step-label">NDA</div>
+            </div>
+            <div class="step" data-step="3">
+              <div class="step-circle">3</div>
+              <div class="step-label">Create Account</div>
+            </div>
+            <div class="step" data-step="4">
+              <div class="step-circle">4</div>
+              <div class="step-label">Complete</div>
+            </div>
+          </div>
+
+          <form id="vendor-signup-form">
+            <!-- Step 1: Company Information -->
+            <div class="form-section active" data-section="1">
+              <h3 style="margin-bottom: 1.5rem">Company Information</h3>
+
+              <div class="form-group">
+                <label class="form-label required" for="company-name"
+                  >Company Name</label
+                >
+                <input
+                  type="text"
+                  id="company-name"
+                  class="form-input"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label required" for="contact-name"
+                  >Primary Contact Name</label
+                >
+                <input
+                  type="text"
+                  id="contact-name"
+                  class="form-input"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label required" for="contact-title"
+                  >Title / Position</label
+                >
+                <input
+                  type="text"
+                  id="contact-title"
+                  class="form-input"
+                  required
+                />
+              </div>
+
+              <div class="grid grid-2">
+                <div class="form-group">
+                  <label class="form-label required" for="email"
+                    >Business Email</label
+                  >
+                  <input type="email" id="email" class="form-input" required />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label required" for="phone"
+                    >Phone Number</label
+                  >
+                  <input type="tel" id="phone" class="form-input" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label required" for="website"
+                  >Company Website</label
+                >
+                <input
+                  type="text"
+                  id="website"
+                  class="form-input"
+                  placeholder="https://yourcompany.com"
+                  required
+                  pattern="https?://.+"
+                />
+                <span class="form-help">Include http:// or https://</span>
+              </div>
+
+              <div class="grid grid-2">
+                <div class="form-group">
+                  <label class="form-label required" for="country"
+                    >Country</label
+                  >
+                  <select id="country" class="form-select" required>
+                    <option value="">Select country</option>
+                    <option value="United States">United States</option>
+                    <option value="Canada">Canada</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="Australia">Australia</option>
+                    <option value="Germany">Germany</option>
+                    <option value="France">France</option>
+                    <option value="India">India</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="company-size"
+                    >Company Size</label
+                  >
+                  <select id="company-size" class="form-select">
+                    <option value="">Select size</option>
+                    <option value="1-10">1-10 employees</option>
+                    <option value="11-50">11-50 employees</option>
+                    <option value="51-200">51-200 employees</option>
+                    <option value="201-500">201-500 employees</option>
+                    <option value="500+">500+ employees</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="services"
+                  >Services / Expertise</label
+                >
+                <textarea
+                  id="services"
+                  class="form-textarea"
+                  rows="3"
+                  placeholder="Brief description of your company's services and expertise"
+                ></textarea>
+              </div>
+
+              <button
+                type="button"
+                class="btn btn-primary btn-lg"
+                style="width: 100%"
+                onclick="goToStep(2)"
+              >
+                Continue to NDA →
+              </button>
+            </div>
+
+            <!-- Step 2: NDA Download & Upload -->
+            <div class="form-section" data-section="2">
+              <h3 style="margin-bottom: 1rem">Non-Disclosure Agreement</h3>
+              <p style="color: var(--text-secondary); margin-bottom: 2rem">
+                To access our RFPs, you must review, sign, and upload our
+                Non-Disclosure Agreement.
+              </p>
+
+              <div
+                class="card"
+                style="background: var(--bg-tertiary); margin-bottom: 2rem"
+              >
+                <div class="card-body">
+                  <h4 style="margin-bottom: 1rem">
+                    📄 Step 1: Download NDA Template
+                  </h4>
+                  <p style="color: var(--text-secondary); margin-bottom: 1rem">
+                    Download our standard NDA template, review it carefully, and
+                    sign it.
+                  </p>
+                  <a
+                    href="/assets/documents/Atlas_NDA_Template.pdf"
+                    download
+                    class="btn btn-primary"
+                    id="download-nda-btn"
+                  >
+                    📥 Download NDA Template
+                  </a>
+                </div>
+              </div>
+
+              <div class="card" style="background: var(--bg-secondary)">
+                <div class="card-body">
+                  <h4 style="margin-bottom: 1rem">
+                    📤 Step 2: Upload Signed NDA
+                  </h4>
+                  <p style="color: var(--text-secondary); margin-bottom: 1rem">
+                    After signing, upload the completed NDA document (PDF format
+                    preferred).
+                  </p>
+
+                  <div
+                    class="upload-area"
+                    id="upload-area"
+                    onclick="document.getElementById('nda-file-input').click()"
+                  >
+                    <input
+                      type="file"
+                      id="nda-file-input"
+                      accept=".pdf,.doc,.docx"
+                      style="display: none"
+                    />
+                    <div id="upload-prompt">
+                      <svg
+                        width="48"
+                        height="48"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        style="margin: 0 auto 1rem; color: var(--primary-color)"
+                      >
+                        <path
+                          d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"
+                        />
+                      </svg>
+                      <p style="font-weight: 600; margin-bottom: 0.5rem">
+                        Click to upload or drag and drop
+                      </p>
+                      <p style="color: var(--text-light); font-size: 0.875rem">
+                        PDF, DOC, or DOCX (max 10MB)
+                      </p>
+                    </div>
+                    <div id="file-preview" class="file-preview hidden">
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                        />
+                        <polyline points="14 2 14 8 20 8" />
+                      </svg>
+                      <div style="flex: 1">
+                        <div id="file-name" style="font-weight: 600"></div>
+                        <div
+                          id="file-size"
+                          style="color: var(--text-light); font-size: 0.875rem"
+                        ></div>
+                      </div>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-ghost"
+                        onclick="removeFile(event)"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+
+                  <div
+                    id="upload-error"
+                    class="form-error hidden"
+                    style="margin-top: 1rem"
+                  ></div>
+                </div>
+              </div>
+
+              <div class="flex gap-2" style="margin-top: 2rem">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  onclick="goToStep(1)"
+                  style="flex: 1"
+                >
+                  ← Back
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  id="continue-to-step-3"
+                  disabled
+                  style="flex: 2"
+                  onclick="goToStep(3)"
+                >
+                  Continue to Account Setup →
+                </button>
+              </div>
+            </div>
+
+            <!-- Step 3: Create Account -->
+            <div class="form-section" data-section="3">
+              <h3 style="margin-bottom: 1rem">Create Your Account</h3>
+              <p style="color: var(--text-secondary); margin-bottom: 2rem">
+                Set up your login credentials to access the vendor portal.
+              </p>
+
+              <div class="form-group">
+                <label class="form-label required" for="vendor-email"
+                  >Email (for login)</label
+                >
+                <input
+                  type="email"
+                  id="vendor-email"
+                  class="form-input"
+                  readonly
+                />
+                <span class="form-help">This will be your username</span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label required" for="vendor-password"
+                  >Password</label
+                >
+                <input
+                  type="password"
+                  id="vendor-password"
+                  class="form-input"
+                  required
+                  minlength="8"
+                />
+                <span class="form-help">Minimum 8 characters</span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label required" for="vendor-password-confirm"
+                  >Confirm Password</label
+                >
+                <input
+                  type="password"
+                  id="vendor-password-confirm"
+                  class="form-input"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label style="display: flex; align-items: start; gap: 0.5rem">
+                  <input
+                    type="checkbox"
+                    id="terms-agree"
+                    required
+                    style="margin-top: 0.25rem"
+                  />
+                  <span class="form-label" style="margin: 0">
+                    I agree to the terms and conditions and confirm that all
+                    information provided is accurate *
+                  </span>
+                </label>
+              </div>
+
+              <div
+                id="password-error"
+                class="form-error hidden"
+                style="margin-bottom: 1rem"
+              ></div>
+
+              <div class="flex gap-2">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  onclick="goToStep(2)"
+                  style="flex: 1"
+                >
+                  ← Back
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-lg"
+                  id="submit-btn"
+                  style="flex: 2"
+                >
+                  <span id="submit-text">Complete Registration</span>
+                  <span id="submit-spinner" class="spinner hidden"></span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Step 4: Success -->
+            <div class="form-section" data-section="4">
+              <div class="success-message">
+                <div class="success-icon">✓</div>
+                <h2>Registration Complete!</h2>
+                <p style="color: var(--text-secondary); margin: 1.5rem 0">
+                  Thank you for registering. Your account is now pending
+                  approval.
+                </p>
+
+                <div
+                  class="card"
+                  style="
+                    background: var(--bg-tertiary);
+                    text-align: left;
+                    margin: 2rem 0;
+                  "
+                >
+                  <div class="card-body">
+                    <h4 style="margin-bottom: 1rem">What happens next?</h4>
+                    <ol
+                      style="margin-left: 1.5rem; color: var(--text-secondary)"
+                    >
+                      <li style="margin-bottom: 0.5rem">
+                        Our team will review your NDA and registration
+                      </li>
+                      <li style="margin-bottom: 0.5rem">
+                        You'll receive an email notification once approved
+                        (usually within 1-2 business days)
+                      </li>
+                      <li style="margin-bottom: 0.5rem">
+                        Once approved, you can log in and access active RFPs
+                      </li>
+                      <li>
+                        You'll be able to submit proposals through your vendor
+                        portal
+                      </li>
+                    </ol>
+                  </div>
+                </div>
+
+                <div
+                  class="card"
+                  style="background: var(--bg-secondary); text-align: left"
+                >
+                  <div class="card-body">
+                    <h4 style="margin-bottom: 0.5rem">📧 Check Your Email</h4>
+                    <p style="color: var(--text-secondary); margin: 0">
+                      We've sent a confirmation email to
+                      <strong id="confirmation-email"></strong>
+                    </p>
+                  </div>
+                </div>
+
+                <a
+                  href="/vendor/login.html"
+                  class="btn btn-primary btn-lg"
+                  style="margin-top: 2rem; display: inline-flex"
+                >
+                  Go to Vendor Login
+                </a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/config.js"></script>
+    <script src="/assets/js/airtable-api.js"></script>
+    <script src="/assets/js/cloudinary-upload.js"></script>
+    <script src="/assets/js/vendor-signup.js"></script>
+  </body>
+</html>

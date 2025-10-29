@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vendor Login | Atlas RFP Portal</title>
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color) 0%,
+          var(--primary-dark) 100%
+        );
+        padding: 2rem;
+      }
+
+      .login-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-xl);
+        padding: 3rem;
+        width: 100%;
+        max-width: 450px;
+      }
+
+      .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .login-logo {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 1rem;
+        background: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <div class="login-logo">V</div>
+          <h2>Vendor Portal</h2>
+          <p style="color: var(--text-light); font-size: 0.875rem">
+            Sign in to access RFPs and manage proposals
+          </p>
+        </div>
+
+        <form id="vendor-login-form">
+          <div class="form-group">
+            <label class="form-label required" for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-input"
+              required
+              autofocus
+              autocomplete="username"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required" for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-input"
+              required
+              autocomplete="current-password"
+            />
+          </div>
+
+          <div id="login-error" class="form-error hidden"></div>
+
+          <button
+            type="submit"
+            class="btn btn-primary btn-lg"
+            style="width: 100%; margin-top: 1rem"
+            id="login-btn"
+          >
+            <span id="login-text">Sign In</span>
+            <span id="login-spinner" class="spinner hidden"></span>
+          </button>
+        </form>
+
+        <div
+          style="
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+          "
+        >
+          <p
+            style="
+              color: var(--text-light);
+              font-size: 0.875rem;
+              margin-bottom: 1rem;
+            "
+          >
+            Don't have an account?
+          </p>
+          <a
+            href="/vendor/signup.html"
+            class="btn btn-outline"
+            style="width: 100%"
+          >
+            Register as Vendor
+          </a>
+        </div>
+
+        <div style="text-align: center; margin-top: 1.5rem">
+          <a href="/" style="color: var(--text-light); font-size: 0.875rem"
+            >← Back to Home</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <script src="/config.js"></script>
+    <script src="/assets/js/airtable-api.js"></script>
+    <script>
+      let airtableAPI;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        if (typeof CONFIG === "undefined") {
+          alert("Configuration not found");
+          return;
+        }
+        airtableAPI = new AirtableAPI(CONFIG);
+      });
+
+      document
+        .getElementById("vendor-login-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          const loginError = document.getElementById("login-error");
+          const loginBtn = document.getElementById("login-btn");
+          const loginText = document.getElementById("login-text");
+          const loginSpinner = document.getElementById("login-spinner");
+
+          loginError.classList.add("hidden");
+          loginBtn.disabled = true;
+          loginText.classList.add("hidden");
+          loginSpinner.classList.remove("hidden");
+
+          try {
+            // Get vendor by email
+            const vendor = await airtableAPI.getVendorByEmail(email);
+
+            if (!vendor) {
+              throw new Error("Invalid email or password");
+            }
+
+            // Check password (in production, use proper password hashing)
+            const storedPassword = atob(vendor.fields["Password Hash"] || "");
+            if (storedPassword !== password) {
+              throw new Error("Invalid email or password");
+            }
+
+            // Check vendor status
+            const status = vendor.fields["Status"];
+            if (status === "Pending Approval") {
+              throw new Error(
+                "Your account is pending approval. You will receive an email once approved."
+              );
+            }
+
+            if (status === "Declined" || status === "Suspended") {
+              throw new Error(
+                "Your account is not active. Please contact support."
+              );
+            }
+
+            // Store session
+            sessionStorage.setItem("vendor_authenticated", "true");
+            sessionStorage.setItem("vendor_id", vendor.id);
+            sessionStorage.setItem("vendor_name", vendor.fields["Vendor Name"]);
+            sessionStorage.setItem("vendor_email", vendor.fields["Email"]);
+            sessionStorage.setItem("vendor_login_time", Date.now());
+
+            // Redirect to vendor dashboard
+            window.location.href = "/vendor/dashboard.html";
+          } catch (error) {
+            loginError.textContent = error.message;
+            loginError.classList.remove("hidden");
+            loginBtn.disabled = false;
+            loginText.classList.remove("hidden");
+            loginSpinner.classList.add("hidden");
+          }
+        });
+    </script>
+  </body>
+</html>

@@ -17,7 +17,7 @@
     <header class="header">
       <div class="container">
         <div class="header-content">
-          <a href="/" class="logo">
+          <a href="/vendor/dashboard.html" class="logo">
             <img
               src="/assets/images/logo.png"
               alt="Atlas Consulting"
@@ -27,7 +27,7 @@
           </a>
           <nav>
             <ul class="nav-links">
-              <li><a href="/">← Back to RFPs</a></li>
+              <li><a href="/vendor/dashboard.html">← Back to Dashboard</a></li>
             </ul>
           </nav>
         </div>
@@ -410,9 +410,24 @@
     <script>
       let airtableAPI;
       let currentRFP = null;
+      let vendorEmail;
+
+      // Check authentication
+      function checkAuth() {
+        const isAuthenticated = sessionStorage.getItem("vendor_authenticated");
+        if (!isAuthenticated) {
+          alert("Please log in to access RFPs");
+          window.location.href = "/vendor/login.html";
+          return false;
+        }
+        vendorEmail = sessionStorage.getItem("vendor_email");
+        return true;
+      }
 
       // Initialize on page load
       document.addEventListener("DOMContentLoaded", async () => {
+        if (!checkAuth()) return;
+
         try {
           if (typeof CONFIG === "undefined") {
             throw new Error("Configuration not found");

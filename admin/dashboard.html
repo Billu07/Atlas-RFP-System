@@ -201,6 +201,9 @@
             📥 Submissions
           </li>
           <li class="sidebar-nav-item" data-view="vendors">🏢 Vendors</li>
+          <li class="sidebar-nav-item" data-view="pending-vendors">
+            ⏳ Pending Approvals
+          </li>
           <li class="sidebar-nav-item" data-view="settings">⚙️ Settings</li>
         </ul>
 
@@ -336,6 +339,39 @@
               style="padding: 2rem; color: var(--text-light)"
             >
               Loading vendors...
+            </p>
+          </div>
+        </div>
+
+        <!-- Pending Vendors View -->
+        <div id="view-pending-vendors" class="view-content hidden">
+          <div class="flex items-center justify-between mb-4">
+            <h1>Pending Vendor Approvals</h1>
+            <button class="btn btn-secondary" onclick="loadPendingVendors()">
+              Refresh
+            </button>
+          </div>
+
+          <div
+            id="pending-alert"
+            class="card hidden"
+            style="
+              border-left: 4px solid var(--warning-color);
+              margin-bottom: 2rem;
+            "
+          >
+            <div class="card-body">
+              <strong>⚠️ Action Required:</strong>
+              <span id="pending-count">0</span> vendor(s) awaiting approval
+            </div>
+          </div>
+
+          <div class="data-table" id="pending-vendors-table">
+            <p
+              class="text-center"
+              style="padding: 2rem; color: var(--text-light)"
+            >
+              Loading pending vendors...
             </p>
           </div>
         </div>

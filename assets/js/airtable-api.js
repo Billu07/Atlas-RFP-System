@@ -168,12 +168,16 @@ class AirtableAPI {
    * Create a vendor
    */
   async createVendor(fields) {
+    console.log("Creating vendor in Airtable...", fields);
+
     const data = await this.request(this.tables.vendors, {
       method: "POST",
       body: JSON.stringify({
         fields: fields,
       }),
     });
+
+    console.log("Airtable createVendor response:", data);
     return data;
   }
 
