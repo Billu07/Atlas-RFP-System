@@ -1,0 +1,27 @@
+{
+  "name": "atlas-rfp-system",
+  "version": "1.0.0",
+  "description": "Professional RFP bid collection and management system",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 8080 -o",
+    "dev": "npx http-server . -p 8080",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "rfp",
+    "bid-collection",
+    "proposal-management",
+    "airtable",
+    "vercel"
+  ],
+  "author": "Atlas Consulting",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/atlas-rfp-system"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

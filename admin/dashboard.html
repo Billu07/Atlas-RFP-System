@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard | Atlas RFP System</title>
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .admin-layout {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        background: var(--bg-primary);
+        border-right: 1px solid var(--border-color);
+        padding: 2rem 0;
+      }
+
+      .sidebar-header {
+        padding: 0 1.5rem 2rem;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 1rem;
+      }
+
+      .sidebar-nav {
+        list-style: none;
+      }
+
+      .sidebar-nav-item {
+        padding: 0.75rem 1.5rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: var(--transition);
+        border-left: 3px solid transparent;
+      }
+
+      .sidebar-nav-item:hover {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+      }
+
+      .sidebar-nav-item.active {
+        background: var(--bg-tertiary);
+        color: var(--primary-color);
+        border-left-color: var(--primary-color);
+        font-weight: 600;
+      }
+
+      .main-content {
+        background: var(--bg-secondary);
+        padding: 2rem;
+        overflow-y: auto;
+      }
+
+      .stat-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-label {
+        color: var(--text-light);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .data-table {
+        width: 100%;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+      }
+
+      .data-table table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .data-table th {
+        background: var(--bg-tertiary);
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: var(--text-primary);
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .data-table td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-secondary);
+      }
+
+      .data-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .data-table tr:hover {
+        background: var(--bg-secondary);
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        padding: 2rem;
+        overflow-y: auto;
+      }
+
+      .modal.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: var(--radius-xl);
+        max-width: 600px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .modal-body {
+        padding: 1.5rem;
+      }
+
+      .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+      }
+
+      @media (max-width: 768px) {
+        .admin-layout {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="admin-layout">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="logo">
+            <img
+              src="/assets/images/logo.png"
+              alt="Atlas"
+              onerror="this.style.display='none'"
+              style="height: 30px"
+            />
+            <strong style="font-size: 1.125rem">Atlas Admin</strong>
+          </div>
+        </div>
+
+        <ul class="sidebar-nav">
+          <li class="sidebar-nav-item active" data-view="dashboard">
+            📊 Dashboard
+          </li>
+          <li class="sidebar-nav-item" data-view="rfps">📄 RFPs</li>
+          <li class="sidebar-nav-item" data-view="submissions">
+            📥 Submissions
+          </li>
+          <li class="sidebar-nav-item" data-view="vendors">🏢 Vendors</li>
+          <li class="sidebar-nav-item" data-view="settings">⚙️ Settings</li>
+        </ul>
+
+        <div
+          style="
+            padding: 0 1.5rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+          "
+        >
+          <button
+            class="btn btn-ghost btn-sm"
+            style="width: 100%"
+            onclick="logout()"
+          >
+            🚪 Logout
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Dashboard View -->
+        <div id="view-dashboard" class="view-content">
+          <div class="flex items-center justify-between mb-4">
+            <h1>Dashboard</h1>
+            <button class="btn btn-primary" onclick="refreshDashboard()">
+              Refresh Data
+            </button>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="grid grid-4 mb-4">
+            <div class="stat-card">
+              <div class="stat-value" id="stat-active-rfps">0</div>
+              <div class="stat-label">Active RFPs</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-submissions">0</div>
+              <div class="stat-label">Total Submissions</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-pending">0</div>
+              <div class="stat-label">Pending Review</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-vendors">0</div>
+              <div class="stat-label">Registered Vendors</div>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Recent Submissions</div>
+            </div>
+            <div id="recent-submissions">
+              <p
+                class="text-center"
+                style="padding: 2rem; color: var(--text-light)"
+              >
+                Loading...
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- RFPs View -->
+        <div id="view-rfps" class="view-content hidden">
+          <div class="flex items-center justify-between mb-4">
+            <h1>Manage RFPs</h1>
+            <button class="btn btn-primary" onclick="showCreateRFPModal()">
+              + Create New RFP
+            </button>
+          </div>
+
+          <div class="data-table" id="rfps-table">
+            <p
+              class="text-center"
+              style="padding: 2rem; color: var(--text-light)"
+            >
+              Loading RFPs...
+            </p>
+          </div>
+        </div>
+
+        <!-- Submissions View -->
+        <div id="view-submissions" class="view-content hidden">
+          <div class="flex items-center justify-between mb-4">
+            <h1>All Submissions</h1>
+            <div class="flex gap-2">
+              <select
+                id="filter-status"
+                class="form-select"
+                style="width: auto"
+                onchange="loadSubmissions()"
+              >
+                <option value="">All Status</option>
+                <option value="Pending">Pending</option>
+                <option value="Under Review">Under Review</option>
+                <option value="Shortlisted">Shortlisted</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+              <button class="btn btn-secondary" onclick="loadSubmissions()">
+                Refresh
+              </button>
+            </div>
+          </div>
+
+          <div class="data-table" id="submissions-table">
+            <p
+              class="text-center"
+              style="padding: 2rem; color: var(--text-light)"
+            >
+              Loading submissions...
+            </p>
+          </div>
+        </div>
+
+        <!-- Vendors View -->
+        <div id="view-vendors" class="view-content hidden">
+          <div class="flex items-center justify-between mb-4">
+            <h1>Vendor Directory</h1>
+            <button class="btn btn-primary" onclick="showAddVendorModal()">
+              + Add Vendor
+            </button>
+          </div>
+
+          <div class="data-table" id="vendors-table">
+            <p
+              class="text-center"
+              style="padding: 2rem; color: var(--text-light)"
+            >
+              Loading vendors...
+            </p>
+          </div>
+        </div>
+
+        <!-- Settings View -->
+        <div id="view-settings" class="view-content hidden">
+          <h1 class="mb-4">System Settings</h1>
+
+          <div class="card mb-4">
+            <div class="card-header">
+              <div class="card-title">Configuration Guide</div>
+            </div>
+            <div class="card-body">
+              <h4>Quick Start Guide</h4>
+              <ol style="margin-left: 1.5rem; color: var(--text-secondary)">
+                <li style="margin-bottom: 0.5rem">
+                  Set up your Airtable base using the schema in
+                  <code>AIRTABLE_SETUP.md</code>
+                </li>
+                <li style="margin-bottom: 0.5rem">
+                  Copy <code>config.example.js</code> to <code>config.js</code>
+                </li>
+                <li style="margin-bottom: 0.5rem">
+                  Add your Airtable Base ID and Personal Access Token
+                </li>
+                <li style="margin-bottom: 0.5rem">
+                  Change the admin password in config.js
+                </li>
+                <li style="margin-bottom: 0.5rem">
+                  Deploy to Vercel or your hosting platform
+                </li>
+              </ol>
+
+              <h4 style="margin-top: 2rem">Creating a New RFP</h4>
+              <ol style="margin-left: 1.5rem; color: var(--text-secondary)">
+                <li style="margin-bottom: 0.5rem">
+                  Click "Create New RFP" in the RFPs section
+                </li>
+                <li style="margin-bottom: 0.5rem">
+                  Fill in all required fields
+                </li>
+                <li style="margin-bottom: 0.5rem">
+                  Set status to "Active" when ready to publish
+                </li>
+                <li style="margin-bottom: 0.5rem">
+                  Share the public link with invited vendors
+                </li>
+              </ol>
+
+              <h4 style="margin-top: 2rem">Reviewing Submissions</h4>
+              <ol style="margin-left: 1.5rem; color: var(--text-secondary)">
+                <li style="margin-bottom: 0.5rem">Go to Submissions section</li>
+                <li style="margin-bottom: 0.5rem">
+                  Click on any submission to view details
+                </li>
+                <li style="margin-bottom: 0.5rem">
+                  Update review status and add internal notes
+                </li>
+                <li style="margin-bottom: 0.5rem">
+                  Use star ratings to compare vendors
+                </li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">System Information</div>
+            </div>
+            <div class="card-body">
+              <div class="grid grid-2">
+                <div>
+                  <small style="color: var(--text-light)">Base ID</small>
+                  <p id="info-base-id" style="font-family: monospace">
+                    Loading...
+                  </p>
+                </div>
+                <div>
+                  <small style="color: var(--text-light)">Company Name</small>
+                  <p id="info-company">Loading...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Create/Edit RFP Modal -->
+    <div id="rfp-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="rfp-modal-title">Create New RFP</h3>
+          <button class="btn btn-ghost btn-sm" onclick="closeRFPModal()">
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="rfp-form">
+            <input type="hidden" id="rfp-id" />
+
+            <div class="form-group">
+              <label class="form-label required" for="rfp-name">RFP Name</label>
+              <input type="text" id="rfp-name" class="form-input" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required" for="rfp-objective"
+                >Objective</label
+              >
+              <textarea
+                id="rfp-objective"
+                class="form-textarea"
+                rows="3"
+                required
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="rfp-scope">Scope of Work</label>
+              <textarea
+                id="rfp-scope"
+                class="form-textarea"
+                rows="4"
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="rfp-timeline"
+                >Timeline Requirements</label
+              >
+              <textarea
+                id="rfp-timeline"
+                class="form-textarea"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <div class="grid grid-2">
+              <div class="form-group">
+                <label class="form-label" for="rfp-budget"
+                  >Budget Guidance</label
+                >
+                <input
+                  type="text"
+                  id="rfp-budget"
+                  class="form-input"
+                  placeholder="e.g., $50k-$100k"
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label required" for="rfp-deadline"
+                  >Submission Deadline</label
+                >
+                <input
+                  type="date"
+                  id="rfp-deadline"
+                  class="form-input"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="grid grid-2">
+              <div class="form-group">
+                <label class="form-label required" for="rfp-owner"
+                  >Owner Name</label
+                >
+                <input type="text" id="rfp-owner" class="form-input" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label required" for="rfp-owner-email"
+                  >Owner Email</label
+                >
+                <input
+                  type="email"
+                  id="rfp-owner-email"
+                  class="form-input"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required" for="rfp-status">Status</label>
+              <select id="rfp-status" class="form-select" required>
+                <option value="Draft">Draft</option>
+                <option value="Active">Active</option>
+                <option value="Closed">Closed</option>
+                <option value="Archived">Archived</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeRFPModal()">
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="saveRFP()">Save RFP</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/config.js"></script>
+    <script src="/assets/js/airtable-api.js"></script>
+    <script src="/assets/js/admin.js"></script>
+  </body>
+</html>

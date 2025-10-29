@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RFP Details | Atlas RFP Portal</title>
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <a href="/" class="logo">
+            <img
+              src="/assets/images/logo.png"
+              alt="Atlas Consulting"
+              onerror="this.style.display='none'"
+            />
+            <span>Atlas Consulting</span>
+          </a>
+          <nav>
+            <ul class="nav-links">
+              <li><a href="/">← Back to RFPs</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="container-narrow" style="padding: 3rem 1.5rem">
+      <!-- Loading State -->
+      <div id="loading" class="text-center" style="padding: 3rem 0">
+        <div
+          class="spinner"
+          style="
+            width: 40px;
+            height: 40px;
+            border-width: 4px;
+            border-color: var(--primary-color);
+            border-top-color: var(--border-color);
+            margin: 0 auto;
+          "
+        ></div>
+        <p style="margin-top: 1rem; color: var(--text-light)">
+          Loading RFP details...
+        </p>
+      </div>
+
+      <!-- Error State -->
+      <div id="error" class="hidden">
+        <div class="card" style="border-left: 4px solid var(--error-color)">
+          <h3>RFP Not Found</h3>
+          <p>The requested RFP could not be found or is no longer active.</p>
+          <a href="/" class="btn btn-primary mt-2">Back to Active RFPs</a>
+        </div>
+      </div>
+
+      <!-- RFP Content -->
+      <div id="rfp-content" class="hidden">
+        <!-- RFP Header -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <div>
+              <div class="card-title" id="rfp-name">Loading...</div>
+              <div class="card-subtitle" id="rfp-id">RFP #</div>
+            </div>
+            <span class="badge badge-success" id="deadline-badge"></span>
+          </div>
+          <div class="card-body">
+            <div class="grid grid-2" style="margin-bottom: 1.5rem">
+              <div>
+                <small
+                  style="
+                    color: var(--text-light);
+                    display: block;
+                    margin-bottom: 0.25rem;
+                  "
+                  >Submission Deadline</small
+                >
+                <strong id="deadline"></strong>
+              </div>
+              <div id="budget-container" class="hidden">
+                <small
+                  style="
+                    color: var(--text-light);
+                    display: block;
+                    margin-bottom: 0.25rem;
+                  "
+                  >Budget Guidance</small
+                >
+                <strong id="budget"></strong>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 1.5rem">
+              <h4 style="margin-bottom: 0.5rem">Objective</h4>
+              <p id="objective" style="white-space: pre-wrap"></p>
+            </div>
+
+            <div
+              id="scope-container"
+              class="hidden"
+              style="margin-bottom: 1.5rem"
+            >
+              <h4 style="margin-bottom: 0.5rem">Scope of Work</h4>
+              <p id="scope" style="white-space: pre-wrap"></p>
+            </div>
+
+            <div id="timeline-container" class="hidden">
+              <h4 style="margin-bottom: 0.5rem">Timeline Requirements</h4>
+              <p id="timeline" style="white-space: pre-wrap"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submission Form -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Submit Your Proposal</div>
+          </div>
+          <div class="card-body">
+            <form id="submission-form">
+              <input type="hidden" id="rfp-record-id" name="rfp-record-id" />
+
+              <!-- Vendor Information -->
+              <h4 style="margin-bottom: 1rem">Vendor Information</h4>
+
+              <div class="form-group">
+                <label class="form-label required" for="vendor-name"
+                  >Company Name</label
+                >
+                <input
+                  type="text"
+                  id="vendor-name"
+                  name="vendor-name"
+                  class="form-input"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label required" for="contact-person"
+                  >Contact Person</label
+                >
+                <input
+                  type="text"
+                  id="contact-person"
+                  name="contact-person"
+                  class="form-input"
+                  required
+                />
+              </div>
+
+              <div class="grid grid-2">
+                <div class="form-group">
+                  <label class="form-label required" for="email"
+                    >Email Address</label
+                  >
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-input"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="phone">Phone Number</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    class="form-input"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="website">Website</label>
+                <input
+                  type="url"
+                  id="website"
+                  name="website"
+                  class="form-input"
+                  placeholder="https://yourcompany.com"
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="country">Country</label>
+                <input
+                  type="text"
+                  id="country"
+                  name="country"
+                  class="form-input"
+                />
+              </div>
+
+              <hr
+                style="
+                  margin: 2rem 0;
+                  border: none;
+                  border-top: 1px solid var(--border-color);
+                "
+              />
+
+              <!-- Proposal Details -->
+              <h4 style="margin-bottom: 1rem">Proposal Details</h4>
+
+              <div class="grid grid-2">
+                <div class="form-group">
+                  <label class="form-label required" for="base-price"
+                    >Base Price</label
+                  >
+                  <input
+                    type="number"
+                    id="base-price"
+                    name="base-price"
+                    class="form-input"
+                    step="0.01"
+                    min="0"
+                    required
+                  />
+                  <span class="form-help">Enter amount in USD</span>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label required" for="timeline-days"
+                    >Timeline (Days)</label
+                  >
+                  <input
+                    type="number"
+                    id="timeline-days"
+                    name="timeline-days"
+                    class="form-input"
+                    min="1"
+                    required
+                  />
+                  <span class="form-help">Estimated delivery timeline</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="optional-addons"
+                  >Optional Add-ons / Additional Services</label
+                >
+                <textarea
+                  id="optional-addons"
+                  name="optional-addons"
+                  class="form-textarea"
+                  rows="4"
+                  placeholder="List any optional services or add-ons with pricing"
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label required" for="assumptions"
+                  >Key Assumptions</label
+                >
+                <textarea
+                  id="assumptions"
+                  name="assumptions"
+                  class="form-textarea"
+                  rows="4"
+                  required
+                  placeholder="List your key assumptions for this proposal"
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="exceptions"
+                  >Exceptions / Exclusions</label
+                >
+                <textarea
+                  id="exceptions"
+                  name="exceptions"
+                  class="form-textarea"
+                  rows="4"
+                  placeholder="List any items not included in your proposal"
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label required" for="proposal-file"
+                  >Proposal Document</label
+                >
+                <input
+                  type="file"
+                  id="proposal-file"
+                  name="proposal-file"
+                  class="form-input"
+                  accept=".pdf,.zip,.doc,.docx"
+                  required
+                />
+                <span class="form-help"
+                  >Upload your detailed proposal (PDF, DOC, or ZIP - Max
+                  10MB)</span
+                >
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="supporting-files"
+                  >Supporting Documents</label
+                >
+                <input
+                  type="file"
+                  id="supporting-files"
+                  name="supporting-files"
+                  class="form-input"
+                  accept=".pdf,.zip,.doc,.docx,.xls,.xlsx"
+                  multiple
+                />
+                <span class="form-help"
+                  >Optional: Additional documents, case studies, certificates,
+                  etc.</span
+                >
+              </div>
+
+              <div class="form-group">
+                <label
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    cursor: pointer;
+                  "
+                >
+                  <input
+                    type="checkbox"
+                    id="nda-confirm"
+                    name="nda-confirm"
+                    required
+                    style="width: auto"
+                  />
+                  <span class="form-label" style="margin: 0"
+                    >I confirm that we have an NDA on file or agree to sign one
+                    if selected *</span
+                  >
+                </label>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="form-group" style="margin-top: 2rem">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-lg"
+                  style="width: 100%"
+                  id="submit-btn"
+                >
+                  <span id="submit-text">Submit Proposal</span>
+                  <span
+                    id="submit-spinner"
+                    class="spinner hidden"
+                    style="width: 20px; height: 20px"
+                  ></span>
+                </button>
+              </div>
+
+              <div
+                id="form-error"
+                class="form-error hidden"
+                style="
+                  margin-top: 1rem;
+                  padding: 1rem;
+                  background: #fee2e2;
+                  border-radius: var(--radius-md);
+                "
+              ></div>
+              <div
+                id="form-success"
+                class="hidden"
+                style="
+                  margin-top: 1rem;
+                  padding: 1rem;
+                  background: #d1fae5;
+                  color: #065f46;
+                  border-radius: var(--radius-md);
+                "
+              ></div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="card mt-4" style="background: var(--bg-tertiary)">
+          <div class="card-body">
+            <h4>Questions?</h4>
+            <p>
+              If you have any questions about this RFP, please contact us at
+              <a href="mailto:rfp@atlasconsulting.com"
+                >rfp@atlasconsulting.com</a
+              >
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="/config.js"></script>
+    <script src="/assets/js/airtable-api.js"></script>
+    <script>
+      let airtableAPI;
+      let currentRFP = null;
+
+      // Initialize on page load
+      document.addEventListener("DOMContentLoaded", async () => {
+        try {
+          if (typeof CONFIG === "undefined") {
+            throw new Error("Configuration not found");
+          }
+
+          airtableAPI = new AirtableAPI(CONFIG);
+
+          // Get RFP ID from URL
+          const params = new URLSearchParams(window.location.search);
+          const rfpId = params.get("id");
+
+          if (!rfpId) {
+            throw new Error("No RFP ID provided");
+          }
+
+          await loadRFP(rfpId);
+        } catch (error) {
+          console.error("Error:", error);
+          showError();
+        }
+      });
+
+      // Load RFP details
+      async function loadRFP(rfpId) {
+        try {
+          currentRFP = await airtableAPI.getRFP(rfpId);
+          const fields = currentRFP.fields;
+
+          // Check if RFP is active
+          if (fields.Status !== "Active") {
+            throw new Error("RFP is not active");
+          }
+
+          // Populate RFP details
+          document.getElementById("rfp-name").textContent = fields["RFP Name"];
+          document.getElementById(
+            "rfp-id"
+          ).textContent = `RFP #${fields["RFP ID"]}`;
+          document.getElementById("rfp-record-id").value = currentRFP.id;
+
+          const deadline = new Date(fields["Submission Deadline"]);
+          const daysLeft = Math.ceil(
+            (deadline - new Date()) / (1000 * 60 * 60 * 24)
+          );
+
+          document.getElementById("deadline").textContent =
+            formatDate(deadline);
+          document.getElementById(
+            "deadline-badge"
+          ).textContent = `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left`;
+          document.getElementById("deadline-badge").className = `badge ${
+            daysLeft <= 3 ? "badge-warning" : "badge-success"
+          }`;
+
+          document.getElementById("objective").textContent =
+            fields["Objective"] || "N/A";
+
+          if (fields["Scope"]) {
+            document.getElementById("scope").textContent = fields["Scope"];
+            document
+              .getElementById("scope-container")
+              .classList.remove("hidden");
+          }
+
+          if (fields["Timeline"]) {
+            document.getElementById("timeline").textContent =
+              fields["Timeline"];
+            document
+              .getElementById("timeline-container")
+              .classList.remove("hidden");
+          }
+
+          if (fields["Budget Guidance"]) {
+            document.getElementById("budget").textContent =
+              fields["Budget Guidance"];
+            document
+              .getElementById("budget-container")
+              .classList.remove("hidden");
+          }
+
+          // Show content
+          document.getElementById("loading").classList.add("hidden");
+          document.getElementById("rfp-content").classList.remove("hidden");
+        } catch (error) {
+          console.error("Error loading RFP:", error);
+          showError();
+        }
+      }
+
+      // Handle form submission
+      document
+        .getElementById("submission-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const submitBtn = document.getElementById("submit-btn");
+          const submitText = document.getElementById("submit-text");
+          const submitSpinner = document.getElementById("submit-spinner");
+          const formError = document.getElementById("form-error");
+          const formSuccess = document.getElementById("form-success");
+
+          // Reset states
+          formError.classList.add("hidden");
+          formSuccess.classList.add("hidden");
+          submitBtn.disabled = true;
+          submitText.classList.add("hidden");
+          submitSpinner.classList.remove("hidden");
+
+          try {
+            // Note: File upload to Airtable requires a public URL
+            // For production, you'd need to upload files to cloud storage first
+            // This is a simplified version
+
+            const formData = {
+              RFP: [currentRFP.id],
+              "Vendor Name": document.getElementById("vendor-name").value,
+              "Contact Person": document.getElementById("contact-person").value,
+              Email: document.getElementById("email").value,
+              Phone: document.getElementById("phone").value || "",
+              Website: document.getElementById("website").value || "",
+              Country: document.getElementById("country").value || "",
+              "Base Price": parseFloat(
+                document.getElementById("base-price").value
+              ),
+              Currency: "USD",
+              "Timeline (Days)": parseInt(
+                document.getElementById("timeline-days").value
+              ),
+              "Optional Add-ons":
+                document.getElementById("optional-addons").value || "",
+              Assumptions: document.getElementById("assumptions").value,
+              Exceptions: document.getElementById("exceptions").value || "",
+              "Review Status": "Pending",
+              "NDA Confirmed": document.getElementById("nda-confirm").checked,
+            };
+
+            // Submit to Airtable
+            await airtableAPI.submitBid(formData);
+
+            // Also create/update vendor record
+            const vendorData = {
+              "Vendor Name": formData["Vendor Name"],
+              "Contact Person": formData["Contact Person"],
+              Email: formData["Email"],
+              Phone: formData["Phone"],
+              Website: formData["Website"],
+              Country: formData["Country"],
+              "NDA on File": formData["NDA Confirmed"],
+              Status: "Submitted",
+            };
+
+            const existingVendor = await airtableAPI.getVendorByEmail(
+              formData["Email"]
+            );
+            if (existingVendor) {
+              await airtableAPI.updateVendor(existingVendor.id, vendorData);
+            } else {
+              await airtableAPI.createVendor(vendorData);
+            }
+
+            // Show success message
+            formSuccess.textContent =
+              "✓ Proposal submitted successfully! We will review your submission and get back to you soon.";
+            formSuccess.classList.remove("hidden");
+
+            // Reset form
+            document.getElementById("submission-form").reset();
+
+            // Scroll to success message
+            formSuccess.scrollIntoView({ behavior: "smooth", block: "center" });
+          } catch (error) {
+            console.error("Submission error:", error);
+            formError.textContent =
+              "Error submitting proposal: " +
+              error.message +
+              ". Please try again or contact support.";
+            formError.classList.remove("hidden");
+          } finally {
+            submitBtn.disabled = false;
+            submitText.classList.remove("hidden");
+            submitSpinner.classList.add("hidden");
+          }
+        });
+
+      function showError() {
+        document.getElementById("loading").classList.add("hidden");
+        document.getElementById("error").classList.remove("hidden");
+      }
+
+      function formatDate(date) {
+        return date.toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+      }
+    </script>
+  </body>
+</html>

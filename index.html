@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Atlas RFP Portal | Request for Proposals</title>
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <a href="/" class="logo">
+            <img
+              src="/assets/images/logo.png"
+              alt="Atlas Consulting"
+              onerror="this.style.display='none'"
+            />
+            <span>Atlas Consulting</span>
+          </a>
+          <nav>
+            <ul class="nav-links">
+              <li><a href="/" class="active">Active RFPs</a></li>
+              <li>
+                <a href="/admin/login.html" class="btn btn-sm btn-outline"
+                  >Admin Login</a
+                >
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <h1>Request for Proposals</h1>
+        <p>
+          Welcome to Atlas Consulting's RFP portal. Browse active opportunities
+          and submit your proposals below.
+        </p>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container" style="padding: 3rem 1.5rem">
+      <!-- Loading State -->
+      <div id="loading" class="text-center" style="padding: 3rem 0">
+        <div
+          class="spinner"
+          style="
+            width: 40px;
+            height: 40px;
+            border-width: 4px;
+            border-color: var(--primary-color);
+            border-top-color: var(--border-color);
+            margin: 0 auto;
+          "
+        ></div>
+        <p style="margin-top: 1rem; color: var(--text-light)">
+          Loading active RFPs...
+        </p>
+      </div>
+
+      <!-- Error State -->
+      <div id="error" class="hidden">
+        <div class="card" style="border-left: 4px solid var(--error-color)">
+          <h3>Unable to Load RFPs</h3>
+          <p id="error-message">
+            There was an error loading the RFPs. Please check your configuration
+            and try again.
+          </p>
+          <button class="btn btn-primary mt-2" onclick="loadRFPs()">
+            Retry
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty" class="hidden text-center" style="padding: 3rem 0">
+        <svg
+          width="64"
+          height="64"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          style="margin: 0 auto; color: var(--text-light)"
+        >
+          <path
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
+        </svg>
+        <h3 style="margin-top: 1rem">No Active RFPs</h3>
+        <p style="color: var(--text-light)">
+          There are currently no active requests for proposals. Please check
+          back later.
+        </p>
+      </div>
+
+      <!-- RFP List -->
+      <div id="rfp-list" class="hidden">
+        <h2 style="margin-bottom: 2rem">Active Opportunities</h2>
+        <div id="rfp-grid" class="grid grid-2">
+          <!-- RFP cards will be inserted here -->
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer
+      style="
+        background: var(--bg-primary);
+        border-top: 1px solid var(--border-color);
+        padding: 2rem 0;
+        margin-top: 4rem;
+      "
+    >
+      <div class="container text-center">
+        <p style="color: var(--text-light); margin: 0">
+          © 2025 Atlas Consulting. All rights reserved. |
+          <a href="mailto:rfp@atlasconsulting.com">Contact Us</a>
+        </p>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/config.js"></script>
+    <script src="/assets/js/airtable-api.js"></script>
+    <script>
+      // Initialize Airtable API
+      let airtableAPI;
+
+      // Load RFPs on page load
+      document.addEventListener("DOMContentLoaded", async () => {
+        try {
+          // Check if config is loaded
+          if (typeof CONFIG === "undefined") {
+            throw new Error(
+              "Configuration not found. Please create config.js from config.example.js"
+            );
+          }
+
+          // Initialize API
+          airtableAPI = new AirtableAPI(CONFIG);
+
+          // Load RFPs
+          await loadRFPs();
+        } catch (error) {
+          console.error("Initialization error:", error);
+          showError(error.message);
+        }
+      });
+
+      // Load active RFPs
+      async function loadRFPs() {
+        const loading = document.getElementById("loading");
+        const error = document.getElementById("error");
+        const empty = document.getElementById("empty");
+        const rfpList = document.getElementById("rfp-list");
+
+        // Reset states
+        loading.classList.remove("hidden");
+        error.classList.add("hidden");
+        empty.classList.add("hidden");
+        rfpList.classList.add("hidden");
+
+        try {
+          const rfps = await airtableAPI.getActiveRFPs();
+
+          loading.classList.add("hidden");
+
+          if (rfps.length === 0) {
+            empty.classList.remove("hidden");
+          } else {
+            rfpList.classList.remove("hidden");
+            renderRFPs(rfps);
+          }
+        } catch (err) {
+          console.error("Error loading RFPs:", err);
+          loading.classList.add("hidden");
+          showError(err.message);
+        }
+      }
+
+      // Render RFP cards
+      function renderRFPs(rfps) {
+        const grid = document.getElementById("rfp-grid");
+        grid.innerHTML = "";
+
+        rfps.forEach((rfp) => {
+          const fields = rfp.fields;
+          const deadline = new Date(fields["Submission Deadline"]);
+          const daysLeft = Math.ceil(
+            (deadline - new Date()) / (1000 * 60 * 60 * 24)
+          );
+
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+          <div class="card-header">
+            <div>
+              <div class="card-title">${escapeHtml(fields["RFP Name"])}</div>
+              <div class="card-subtitle">RFP #${fields["RFP ID"]}</div>
+            </div>
+            <span class="badge ${
+              daysLeft <= 3 ? "badge-warning" : "badge-success"
+            }">
+              ${daysLeft} day${daysLeft !== 1 ? "s" : ""} left
+            </span>
+          </div>
+          <div class="card-body">
+            <p>${escapeHtml(
+              fields["Objective"] || "No description available"
+            )}</p>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+              ${
+                fields["Budget Guidance"]
+                  ? `
+                <div>
+                  <small style="color: var(--text-light); display: block;">Budget</small>
+                  <strong>${escapeHtml(fields["Budget Guidance"])}</strong>
+                </div>
+              `
+                  : ""
+              }
+              <div>
+                <small style="color: var(--text-light); display: block;">Deadline</small>
+                <strong>${formatDate(deadline)}</strong>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a href="/public/rfp-detail.html?id=${
+              rfp.id
+            }" class="btn btn-primary">
+              View Details & Submit
+            </a>
+          </div>
+        `;
+          grid.appendChild(card);
+        });
+      }
+
+      // Show error message
+      function showError(message) {
+        const error = document.getElementById("error");
+        const errorMessage = document.getElementById("error-message");
+        errorMessage.textContent = message;
+        error.classList.remove("hidden");
+      }
+
+      // Utility: Escape HTML
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // Utility: Format date
+      function formatDate(date) {
+        return date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login | Atlas RFP System</title>
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color) 0%,
+          var(--primary-dark) 100%
+        );
+        padding: 2rem;
+      }
+
+      .login-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-xl);
+        padding: 3rem;
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .login-logo {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 1rem;
+        background: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <div class="login-logo">A</div>
+          <h2>Admin Login</h2>
+          <p style="color: var(--text-light); font-size: 0.875rem">
+            Atlas RFP Management System
+          </p>
+        </div>
+
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label required" for="username">Username</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              class="form-input"
+              required
+              autofocus
+              autocomplete="username"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required" for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-input"
+              required
+              autocomplete="current-password"
+            />
+          </div>
+
+          <div id="login-error" class="form-error hidden"></div>
+
+          <button
+            type="submit"
+            class="btn btn-primary btn-lg"
+            style="width: 100%; margin-top: 1rem"
+            id="login-btn"
+          >
+            <span id="login-text">Sign In</span>
+            <span id="login-spinner" class="spinner hidden"></span>
+          </button>
+        </form>
+
+        <div
+          style="
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+          "
+        >
+          <a href="/" style="color: var(--text-light); font-size: 0.875rem"
+            >← Back to Public Portal</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <script src="/config.js"></script>
+    <script>
+      document.getElementById("login-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const loginError = document.getElementById("login-error");
+        const loginBtn = document.getElementById("login-btn");
+        const loginText = document.getElementById("login-text");
+        const loginSpinner = document.getElementById("login-spinner");
+
+        loginError.classList.add("hidden");
+        loginBtn.disabled = true;
+        loginText.classList.add("hidden");
+        loginSpinner.classList.remove("hidden");
+
+        // Simple authentication check
+        setTimeout(() => {
+          if (
+            username === CONFIG.admin.username &&
+            password === CONFIG.admin.password
+          ) {
+            // Store session
+            sessionStorage.setItem("admin_authenticated", "true");
+            sessionStorage.setItem("admin_login_time", Date.now());
+
+            // Redirect to dashboard
+            window.location.href = "/admin/dashboard.html";
+          } else {
+            loginError.textContent = "Invalid username or password";
+            loginError.classList.remove("hidden");
+            loginBtn.disabled = false;
+            loginText.classList.remove("hidden");
+            loginSpinner.classList.add("hidden");
+          }
+        }, 500);
+      });
+    </script>
+  </body>
+</html>
