@@ -1,6 +1,6 @@
 # Sensitive configuration
-config.example.js
 config.js
+config.example.js
 
 # Dependencies
 node_modules/
